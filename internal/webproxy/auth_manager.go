@@ -10,6 +10,8 @@ func NewNoopAuthManager() *NoopAuthManager {
 	return &NoopAuthManager{}
 }
 
+func (am *NoopAuthManager) AddAccount(username, password string) {}
+
 func (am *NoopAuthManager) CheckCredentials(username, password string) bool {
 	return true
 }

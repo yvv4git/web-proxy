@@ -10,6 +10,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/yvv4git/web-proxy/internal/config"
 	"github.com/yvv4git/web-proxy/internal/infra"
+	"go.uber.org/zap"
 )
 
 func RunWebProxy(configPath string) {
@@ -30,8 +31,13 @@ func RunWebProxy(configPath string) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	wp := NewWebProxy(log)
-	if err := wp.Start(ctx); err != nil {
-		stdLog.Fatalf("Failed to start web proxy: %v", err)
+	webProxy := NewWebProxy(log)
+
+	for _, v := range cfg.Auth.PredifinedAuth.Accounts {
+		webProxy.authManager.AddAccount(v.Username, v.Password)
+	}
+
+	if err := webProxy.Start(ctx); err != nil {
+		log.Fatal("Failed to start web proxy: %v", zap.Error(err))
 	}
 }

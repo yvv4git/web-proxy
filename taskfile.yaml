@@ -19,4 +19,4 @@ tasks:
   check_proxy:
     desc: Check if the proxy is running
     cmds:
-      - curl --proxy localhost:8080 https://ifconfig.io/ip
+      - curl --proxy localhost:8080 -U admin:secret https://ifconfig.io/ip
