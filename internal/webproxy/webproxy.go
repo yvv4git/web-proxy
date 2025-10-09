@@ -36,6 +36,7 @@ func NewWebProxy(log *zap.Logger, opts ...Option) *WebProxy {
 
 	proxy := goproxy.NewProxyHttpServer()
 
+	// Create entity with default options
 	entity := &WebProxy{}
 	entity.log = log
 	entity.webSrv = &http.Server{
@@ -43,6 +44,7 @@ func NewWebProxy(log *zap.Logger, opts ...Option) *WebProxy {
 		Handler: proxy,
 	}
 
+	// Update entity with custom options
 	for _, opt := range opts {
 		opt(entity)
 	}
