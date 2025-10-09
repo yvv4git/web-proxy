@@ -23,15 +23,27 @@ func WithShutdownTimeout(timeout time.Duration) Option {
 	}
 }
 
+func WithAuthManager(authManager AuthManager) Option {
+	return func(wp *WebProxy) {
+		wp.authManager = authManager
+	}
+}
+
+type AuthManager interface {
+	CheckCredentials(username, password string) bool
+}
+
 type WebProxy struct {
 	log             *zap.Logger
 	shutdownTimeout time.Duration
 	webSrv          *http.Server
+	authManager     AuthManager
 }
 
 func NewWebProxy(log *zap.Logger, opts ...Option) *WebProxy {
 	const (
-		defaultAddr = "127.0.0.1:8080"
+		defaultAddr        = "127.0.0.1:8080"
+		defaultAuthTimeout = 5 * time.Second
 	)
 
 	proxy := goproxy.NewProxyHttpServer()
@@ -39,10 +51,12 @@ func NewWebProxy(log *zap.Logger, opts ...Option) *WebProxy {
 	// Create entity with default options
 	entity := &WebProxy{}
 	entity.log = log
+	entity.shutdownTimeout = defaultAuthTimeout
 	entity.webSrv = &http.Server{
 		Addr:    defaultAddr,
 		Handler: proxy,
 	}
+	entity.authManager = NewNoopAuthManager()
 
 	// Update entity with custom options
 	for _, opt := range opts {
