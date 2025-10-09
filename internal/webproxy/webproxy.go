@@ -30,7 +30,6 @@ func WithAuthManager(authManager AuthManager) Option {
 }
 
 type AuthManager interface {
-	AddAccount(username, password string)
 	CheckCredentials(username, password string) bool
 }
 

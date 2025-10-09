@@ -28,11 +28,14 @@ func RunWebProxy(configPath string) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	webProxy := NewWebProxy(log)
-
+	// Setup auth manager
+	authManager := NewBasicAuthManager()
 	for _, v := range cfg.Auth.PredifinedAuth.Accounts {
-		webProxy.authManager.AddAccount(v.Username, v.Password)
+		authManager.AddAccount(v.Username, v.Password)
 	}
+
+	// Setup web proxy
+	webProxy := NewWebProxy(log, WithAuthManager(authManager))
 
 	if err := webProxy.Start(ctx); err != nil {
 		log.Fatal("failed to start web proxy: %v", zap.Error(err))
