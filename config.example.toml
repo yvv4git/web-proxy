@@ -1,0 +1,11 @@
+log_level = "info"
+
+[server]
+host = "localhost"
+port = 8080
+
+[auth]
+predifined_auth = { accounts = [
+  { username = "admin", password = "secret" },
+  { username = "user", password = "password" }
+]}
