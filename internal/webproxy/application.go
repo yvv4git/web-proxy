@@ -1,12 +1,15 @@
-package application
+package webproxy
 
 import (
+	"context"
 	stdLog "log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/yvv4git/web-proxy/internal/config"
 	"github.com/yvv4git/web-proxy/internal/infra"
-	"github.com/yvv4git/web-proxy/internal/webproxy"
 )
 
 func RunWebProxy(configPath string) {
@@ -24,8 +27,11 @@ func RunWebProxy(configPath string) {
 	}
 	defer log.Sync()
 
-	wp := webproxy.NewWebProxy()
-	if err := wp.Start(); err != nil {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	wp := NewWebProxy(log)
+	if err := wp.Start(ctx); err != nil {
 		stdLog.Fatalf("Failed to start web proxy: %v", err)
 	}
 }

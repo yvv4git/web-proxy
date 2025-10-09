@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/yvv4git/web-proxy/internal/webproxy/application"
+	"github.com/yvv4git/web-proxy/internal/webproxy"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 		Use:   "run",
 		Short: "Run web proxy server",
 		Run: func(cmd *cobra.Command, args []string) {
-			application.RunWebProxy(configPath)
+			webproxy.RunWebProxy(configPath)
 		},
 	}
 
