@@ -1,0 +1,22 @@
+version: '3'
+
+dotenv: []
+
+run: when_changed
+
+vars:
+  DOCKER_COMPOSE_CMD:
+    sh: |
+      if command -v docker-compose >/dev/null 2>&1; then
+        echo "docker-compose"
+      elif docker compose version >/dev/null 2>&1; then
+        echo "docker compose"
+      else
+        echo "none"
+      fi
+
+tasks:
+  check_proxy:
+    desc: Check if the proxy is running
+    cmds:
+      - curl --proxy localhost:8080 https://ifconfig.io/ip
