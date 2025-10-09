@@ -29,6 +29,12 @@ func WithAuthManager(authManager AuthManager) Option {
 	}
 }
 
+func WithWrappedLogger(logger goproxy.Logger) Option {
+	return func(wp *WebProxy) {
+		wp.proxy.Logger = logger
+	}
+}
+
 type AuthManager interface {
 	CheckCredentials(username, password string) bool
 }
@@ -36,6 +42,7 @@ type AuthManager interface {
 type WebProxy struct {
 	log             *zap.Logger
 	shutdownTimeout time.Duration
+	proxy           *goproxy.ProxyHttpServer
 	webSrv          *http.Server
 	authManager     AuthManager
 }
@@ -46,15 +53,14 @@ func NewWebProxy(log *zap.Logger, opts ...Option) *WebProxy {
 		defaultAuthTimeout = 5 * time.Second
 	)
 
-	proxy := goproxy.NewProxyHttpServer()
-
 	// Create entity with default options
 	entity := &WebProxy{}
 	entity.log = log
 	entity.shutdownTimeout = defaultAuthTimeout
+	entity.proxy = goproxy.NewProxyHttpServer()
 	entity.webSrv = &http.Server{
 		Addr:    defaultAddr,
-		Handler: proxy,
+		Handler: entity.proxy,
 	}
 	entity.authManager = NewNoopAuthManager()
 
@@ -64,10 +70,10 @@ func NewWebProxy(log *zap.Logger, opts ...Option) *WebProxy {
 	}
 
 	// For all standard requests
-	proxy.OnRequest().Do(goproxy.FuncReqHandler(entity.authMiddleware))
+	entity.proxy.OnRequest().Do(goproxy.FuncReqHandler(entity.authMiddleware))
 
 	// For connect requests in https
-	proxy.OnRequest().HandleConnect(goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
+	entity.proxy.OnRequest().HandleConnect(goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
 		_, resp := entity.authMiddleware(ctx.Req, ctx)
 		if resp != nil {
 			ctx.Resp = resp

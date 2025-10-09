@@ -34,8 +34,13 @@ func RunWebProxy(configPath string) {
 		authManager.AddAccount(v.Username, v.Password)
 	}
 
+	// Setups web proxy wrapped logger
+	wrappedLogger := NewWrapedZapLogger(log)
+
 	// Setup web proxy
-	webProxy := NewWebProxy(log, WithAuthManager(authManager))
+	webProxy := NewWebProxy(log,
+		WithAuthManager(authManager),
+		WithWrappedLogger(wrappedLogger))
 
 	if err := webProxy.Start(ctx); err != nil {
 		log.Fatal("failed to start web proxy: %v", zap.Error(err))
