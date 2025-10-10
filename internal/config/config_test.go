@@ -27,6 +27,7 @@ log_level = "info"
 [server]
 host = "file-host"
 port = 1234
+verbose = false
 
 [auth]
 predifined_auth = { accounts = [
@@ -47,6 +48,7 @@ predifined_auth = { accounts = [
 		Server: Server{
 			Host: "file-host",
 			Port: 1234,
+			Verbose: false,
 		},
 		Auth: Auth{
 			PredifinedAuth: PredifinedAuth{

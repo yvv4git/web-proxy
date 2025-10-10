@@ -37,10 +37,13 @@ func RunWebProxy(configPath string) {
 	// Setups web proxy wrapped logger
 	wrappedLogger := NewWrapedZapLogger(log)
 
+	// todo: proxy.Verbose = cfg.Verbose
+
 	// Setup web proxy
 	webProxy := NewWebProxy(log,
 		WithAuthManager(authManager),
-		WithWrappedLogger(wrappedLogger))
+		WithWrappedLogger(wrappedLogger),
+		WithLogVerbose(cfg.Server.Verbose))
 
 	if err := webProxy.Start(ctx); err != nil {
 		log.Fatal("failed to start web proxy: %v", zap.Error(err))

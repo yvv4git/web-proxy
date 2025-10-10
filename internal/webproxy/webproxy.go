@@ -35,6 +35,12 @@ func WithWrappedLogger(logger goproxy.Logger) Option {
 	}
 }
 
+func WithLogVerbose(value bool) Option {
+	return func(wp *WebProxy) {
+		wp.proxy.Verbose = value
+	}
+}
+
 type AuthManager interface {
 	CheckCredentials(username, password string) bool
 }
