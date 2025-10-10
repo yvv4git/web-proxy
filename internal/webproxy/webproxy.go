@@ -57,6 +57,7 @@ func NewWebProxy(log *zap.Logger, opts ...Option) *WebProxy {
 	const (
 		defaultAddr        = "127.0.0.1:8080"
 		defaultAuthTimeout = 5 * time.Second
+		defaultLogVerbose  = false
 	)
 
 	// Create entity with default options
@@ -64,6 +65,7 @@ func NewWebProxy(log *zap.Logger, opts ...Option) *WebProxy {
 	entity.log = log
 	entity.shutdownTimeout = defaultAuthTimeout
 	entity.proxy = goproxy.NewProxyHttpServer()
+	entity.proxy.Verbose = defaultLogVerbose
 	entity.webSrv = &http.Server{
 		Addr:    defaultAddr,
 		Handler: entity.proxy,
